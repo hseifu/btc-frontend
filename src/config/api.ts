@@ -9,4 +9,7 @@ export const API_ENDPOINTS = {
     REGISTER: `${API_BASE_URL}/v1/auth/register`,
     LOGOUT: `${API_BASE_URL}/v1/auth/logout`,
   },
+  BTC: {
+    PRICE: `${API_BASE_URL}/v1/btc-tracker/price`,
+  },
 } as const
