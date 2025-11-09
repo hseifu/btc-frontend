@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/store/authStore'
 import axios from 'axios'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3009'
@@ -44,6 +45,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // Handle unauthorized access
       console.error('Unauthorized access')
+      useAuthStore.getState().logout()
     }
     return Promise.reject(error)
   },

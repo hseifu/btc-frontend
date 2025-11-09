@@ -11,14 +11,13 @@ import {
 import { GuessStatus, useGuessesStore } from '@/store/guessesStore'
 import { ArrowDown, ArrowUp, Clock, History } from 'lucide-react'
 import { useEffect } from 'react'
+import { TickerPriceChange } from './ui/ticker'
 
 export const GuessHistory = () => {
   const { myGuesses, isLoading, fetchMyGuesses } = useGuessesStore()
 
   useEffect(() => {
     fetchMyGuesses()
-    const interval = setInterval(fetchMyGuesses, 10000)
-    return () => clearInterval(interval)
   }, [fetchMyGuesses])
 
   const getStatusBadge = (status: GuessStatus) => {
@@ -31,9 +30,9 @@ export const GuessHistory = () => {
           </Badge>
         )
       case GuessStatus.WON:
-        return <Badge className="bg-green-600">Won +10</Badge>
+        return <Badge className="bg-green-600">Won +1</Badge>
       case GuessStatus.LOST:
-        return <Badge className="bg-red-600">Lost -5</Badge>
+        return <Badge className="bg-red-600">Lost -1</Badge>
     }
   }
 
@@ -55,7 +54,7 @@ export const GuessHistory = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Direction</TableHead>
+                <TableHead>Predicted Direction</TableHead>
                 <TableHead>Initial Price</TableHead>
                 <TableHead>Final Price</TableHead>
                 <TableHead>Status</TableHead>
@@ -92,6 +91,12 @@ export const GuessHistory = () => {
                           maximumFractionDigits: 2,
                         })}`
                       : '-'}
+                    {/* Show ticker showing the price change */}
+                    {guess.finalPrice !== null && (
+                      <TickerPriceChange
+                        change={guess.finalPrice - guess.initialPrice}
+                      />
+                    )}
                   </TableCell>
                   <TableCell>{getStatusBadge(guess.status)}</TableCell>
                   <TableCell className="text-sm text-gray-500">

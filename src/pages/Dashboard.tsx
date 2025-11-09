@@ -35,10 +35,6 @@ export const Dashboard = () => {
     if (isAuthenticated && user) {
       fetchBtcPriceData()
       fetchMyScore(user.id)
-
-      // Refresh BTC price every 30 seconds
-      const interval = setInterval(fetchBtcPriceData, 30000)
-      return () => clearInterval(interval)
     }
   }, [isAuthenticated, user, fetchBtcPriceData, fetchMyScore])
 
@@ -92,8 +88,11 @@ export const Dashboard = () => {
                     symbol="BTC"
                   />
                   <TickerSymbol symbol="BTC" />
-                  <TickerPrice price={btcPriceData.price} />
-                  <TickerPriceChange change={btcPriceData.priceChangeLast24h} />
+                  <TickerPrice price={btcPriceData.price} pulsating={true} />
+                  <TickerPriceChange
+                    change={btcPriceData.priceChangeLast24h}
+                    pulsating={true}
+                  />
                 </Ticker>
               ) : (
                 <p className="text-gray-500">No BTC price data available</p>

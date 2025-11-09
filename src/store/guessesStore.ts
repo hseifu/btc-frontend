@@ -55,6 +55,7 @@ export const useGuessesStore = create<GuessesState>((set) => ({
       })
 
       set((state) => ({
+        // Optimistically update the myGuesses array
         myGuesses: [response.data, ...state.myGuesses],
         isLoading: false,
         error: null,
