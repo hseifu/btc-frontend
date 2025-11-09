@@ -49,7 +49,7 @@ export const GuessCard = () => {
                 <Button
                   onClick={() => handleGuess(GuessDirection.UP)}
                   disabled={isLoading || hasPendingGuess}
-                  className="w-full h-20 bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full h-20 bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <ArrowUp className="mr-2 h-6 w-6" />
                   <div>
@@ -74,7 +74,7 @@ export const GuessCard = () => {
                 <Button
                   onClick={() => handleGuess(GuessDirection.DOWN)}
                   disabled={isLoading || hasPendingGuess}
-                  className="w-full h-20 bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full h-20 bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <ArrowDown className="mr-2 h-6 w-6" />
                   <div>

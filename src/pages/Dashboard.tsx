@@ -21,7 +21,14 @@ import { useNavigate } from 'react-router-dom'
 
 export const Dashboard = () => {
   const { user, isAuthenticated, logout } = useAuthStore()
-  const { btcPriceData, isLoading, fetchBtcPriceData } = useBtcStore()
+  const {
+    btcPriceData,
+    isLoading,
+    isConnected,
+    connectWebSocket,
+    disconnectWebSocket,
+    fetchBtcPriceData,
+  } = useBtcStore()
   const { myScore, fetchMyScore } = useScoresStore()
   const navigate = useNavigate()
 
@@ -33,10 +40,21 @@ export const Dashboard = () => {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      fetchBtcPriceData()
+      // Connect to WebSocket for real-time BTC price updates
+      connectWebSocket()
       fetchMyScore(user.id)
+
+      return () => {
+        disconnectWebSocket()
+      }
     }
-  }, [isAuthenticated, user, fetchBtcPriceData, fetchMyScore])
+  }, [
+    isAuthenticated,
+    user,
+    connectWebSocket,
+    disconnectWebSocket,
+    fetchMyScore,
+  ])
 
   if (!user) {
     return null
@@ -82,18 +100,28 @@ export const Dashboard = () => {
               {isLoading ? (
                 <Skeleton className="w-64 h-10" />
               ) : btcPriceData ? (
-                <Ticker>
-                  <TickerIcon
-                    src="https://s2.coinmarketcap.com/static/img/coins/64x64/1.png"
-                    symbol="BTC"
-                  />
-                  <TickerSymbol symbol="BTC" />
-                  <TickerPrice price={btcPriceData.price} pulsating={true} />
-                  <TickerPriceChange
-                    change={btcPriceData.priceChangeLast24h}
-                    pulsating={true}
-                  />
-                </Ticker>
+                <>
+                  <Ticker>
+                    <TickerIcon
+                      src="https://s2.coinmarketcap.com/static/img/coins/64x64/1.png"
+                      symbol="BTC"
+                    />
+                    <TickerSymbol symbol="BTC" />
+                    <TickerPrice price={btcPriceData.price} />
+                    <TickerPriceChange
+                      change={btcPriceData.priceChangeLast24h}
+                    />
+                  </Ticker>
+                  {isConnected && (
+                    <Badge
+                      variant="outline"
+                      className="bg-green-50 text-green-700 border-green-200 animate-pulse"
+                    >
+                      <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                      Live
+                    </Badge>
+                  )}
+                </>
               ) : (
                 <p className="text-gray-500">No BTC price data available</p>
               )}

@@ -26,7 +26,6 @@ export const useTickerContext = () => useContext(TickerContext)
 export type TickerProps = HTMLAttributes<HTMLButtonElement> & {
   currency?: string
   locale?: string
-  pulsating?: boolean
 }
 
 export const Ticker = memo(
@@ -35,7 +34,6 @@ export const Ticker = memo(
     className,
     currency = DEFAULT_CURRENCY,
     locale = DEFAULT_LOCALE,
-    pulsating = false,
     ...props
   }: TickerProps & { children: ReactNode }) => {
     const formatter = useMemo(() => {
@@ -56,7 +54,6 @@ export const Ticker = memo(
         <button
           className={cn(
             'inline-flex items-center gap-1.5 whitespace-nowrap align-middle',
-            pulsating && 'animate-pulse',
             className,
           )}
           type="button"
@@ -109,11 +106,10 @@ TickerSymbol.displayName = 'TickerSymbol'
 
 export type TickerPriceProps = HTMLAttributes<HTMLSpanElement> & {
   price: number
-  pulsating?: boolean
 }
 
 export const TickerPrice = memo(
-  ({ price, className, pulsating = false, ...props }: TickerPriceProps) => {
+  ({ price, className, ...props }: TickerPriceProps) => {
     const context = useTickerContext()
 
     const formattedPrice = useMemo(
@@ -136,17 +132,10 @@ TickerPrice.displayName = 'TickerPrice'
 export type TickerPriceChangeProps = HTMLAttributes<HTMLSpanElement> & {
   change: number
   isPercent?: boolean
-  pulsating?: boolean
 }
 
 export const TickerPriceChange = memo(
-  ({
-    change,
-    isPercent,
-    className,
-    pulsating = false,
-    ...props
-  }: TickerPriceChangeProps) => {
+  ({ change, isPercent, className, ...props }: TickerPriceChangeProps) => {
     const isPositiveChange = useMemo(() => change >= 0, [change])
     const context = useTickerContext()
 
@@ -165,7 +154,6 @@ export const TickerPriceChange = memo(
             ? 'text-green-600 dark:text-green-500'
             : 'text-red-600 dark:text-red-500',
           className,
-          pulsating && 'animate-pulse',
         )}
         {...props}
       >
