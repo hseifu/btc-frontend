@@ -11,10 +11,12 @@ export interface User {
 
 interface AuthResponse {
   user: User
+  accessToken: string
 }
 
 interface AuthState {
   user: User | null
+  accessToken: string | null
   isAuthenticated: boolean
   isLoading: boolean
   error: string | null
@@ -28,6 +30,7 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
+      accessToken: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
@@ -42,6 +45,7 @@ export const useAuthStore = create<AuthState>()(
 
           set({
             user: response.data.user,
+            accessToken: response.data.accessToken,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -59,6 +63,7 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             isAuthenticated: false,
             user: null,
+            accessToken: null,
           })
           throw error
         }
@@ -74,6 +79,7 @@ export const useAuthStore = create<AuthState>()(
 
           set({
             user: response.data.user,
+            accessToken: response.data.accessToken,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -90,6 +96,7 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             isAuthenticated: false,
             user: null,
+            accessToken: null,
           })
           throw error
         }
@@ -98,6 +105,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         set({
           user: null,
+          accessToken: null,
           isAuthenticated: false,
           isLoading: false,
           error: null,
@@ -112,6 +120,7 @@ export const useAuthStore = create<AuthState>()(
       name: 'auth-storage',
       partialize: (state) => ({
         user: state.user,
+        accessToken: state.accessToken,
         isAuthenticated: state.isAuthenticated,
       }),
     },

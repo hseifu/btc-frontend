@@ -10,14 +10,23 @@ export const apiClient = axios.create({
   withCredentials: true,
 })
 
-// Request interceptor for adding auth tokens or other headers
+// Request interceptor for adding auth tokens
 apiClient.interceptors.request.use(
   (config) => {
-    // You can add auth tokens here if needed
-    // const token = localStorage.getItem('token')
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`
-    // }
+    // Get token from Zustand persisted storage
+    const authStorage = localStorage.getItem('auth-storage')
+    if (authStorage) {
+      try {
+        const { state } = JSON.parse(authStorage)
+        const token = state?.accessToken
+
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`
+        }
+      } catch (error) {
+        console.error('Failed to parse auth storage:', error)
+      }
+    }
     return config
   },
   (error) => {

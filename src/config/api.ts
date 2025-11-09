@@ -12,4 +12,15 @@ export const API_ENDPOINTS = {
   BTC: {
     PRICE: `${API_BASE_URL}/v1/btc-tracker/price`,
   },
+  GUESSES: {
+    BASE: `${API_BASE_URL}/v1/guesses`,
+    ME: `${API_BASE_URL}/v1/guesses/me`,
+    PENDING: `${API_BASE_URL}/v1/guesses/pending`,
+    BY_ID: (id: string) => `${API_BASE_URL}/v1/guesses/${id}`,
+    VALIDATE: (id: string) => `${API_BASE_URL}/v1/guesses/${id}/validate`,
+  },
+  SCORES: {
+    BASE: `${API_BASE_URL}/v1/scores`,
+    BY_USER_ID: (userId: string) => `${API_BASE_URL}/v1/scores/user/${userId}`,
+  },
 } as const
