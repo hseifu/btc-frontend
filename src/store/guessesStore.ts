@@ -1,3 +1,4 @@
+import { disconnectGuessSocket, getGuessSocket } from '@/config/socket'
 import { apiClient } from '@/lib/axios'
 import { AxiosError } from 'axios'
 import { create } from 'zustand'
@@ -34,17 +35,23 @@ interface GuessesState {
   guesses: Guess[]
   myGuesses: Guess[]
   isLoading: boolean
+  isConnected: boolean
   error: string | null
   createGuess: (direction: GuessDirection) => Promise<Guess>
   fetchMyGuesses: () => Promise<void>
   fetchAllGuesses: () => Promise<void>
+  connectWebSocket: () => void
+  disconnectWebSocket: () => void
+  subscribeToGuess: (guessId: string) => void
+  subscribeToPendingGuesses: () => void
   clearError: () => void
 }
 
-export const useGuessesStore = create<GuessesState>((set) => ({
+export const useGuessesStore = create<GuessesState>((set, get) => ({
   guesses: [],
   myGuesses: [],
   isLoading: false,
+  isConnected: false,
   error: null,
 
   createGuess: async (direction: GuessDirection) => {
@@ -60,6 +67,11 @@ export const useGuessesStore = create<GuessesState>((set) => ({
         isLoading: false,
         error: null,
       }))
+
+      // Subscribe to the newly created guess for real-time updates
+      if (response.data.status === GuessStatus.PENDING) {
+        get().subscribeToGuess(response.data.id)
+      }
 
       return response.data
     } catch (error) {
@@ -87,6 +99,9 @@ export const useGuessesStore = create<GuessesState>((set) => ({
         isLoading: false,
         error: null,
       })
+
+      // Subscribe to pending guesses after fetching
+      get().subscribeToPendingGuesses()
     } catch (error) {
       const axiosError = error as AxiosError<{ message: string }>
       const errorMessage =
@@ -122,6 +137,81 @@ export const useGuessesStore = create<GuessesState>((set) => ({
         error: errorMessage,
         isLoading: false,
       })
+    }
+  },
+
+  connectWebSocket: () => {
+    const socket = getGuessSocket()
+
+    // Don't reconnect if already connected
+    if (socket.connected) {
+      return
+    }
+
+    // Set up event listeners
+    socket.on('connect', () => {
+      console.log('Connected to Guess notifications WebSocket')
+      set({ isConnected: true })
+      get().subscribeToPendingGuesses()
+    })
+
+    socket.on('guessValidated', (validatedGuess: Guess) => {
+      console.log('Received guess validation:', validatedGuess)
+
+      set((state) => ({
+        myGuesses: state.myGuesses.map((guess) =>
+          guess.id === validatedGuess.id ? validatedGuess : guess,
+        ),
+      }))
+
+      set((state) => ({
+        guesses: state.guesses.map((guess) =>
+          guess.id === validatedGuess.id ? validatedGuess : guess,
+        ),
+      }))
+    })
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from Guess notifications WebSocket')
+      set({ isConnected: false })
+    })
+
+    socket.on('connect_error', (error) => {
+      console.error('WebSocket connection error:', error)
+      set({
+        error: 'Failed to connect to guess notifications',
+        isConnected: false,
+      })
+    })
+
+    socket.connect()
+  },
+
+  disconnectWebSocket: () => {
+    disconnectGuessSocket()
+    set({ isConnected: false })
+  },
+
+  subscribeToGuess: (guessId: string) => {
+    const socket = getGuessSocket()
+    if (socket.connected) {
+      socket.emit('subscribeToGuess', guessId)
+      console.log(`Subscribed to guess ${guessId}`)
+    }
+  },
+
+  subscribeToPendingGuesses: () => {
+    const { myGuesses } = get()
+    const pendingGuesses = myGuesses.filter(
+      (guess) => guess.status === GuessStatus.PENDING,
+    )
+
+    pendingGuesses.forEach((guess) => {
+      get().subscribeToGuess(guess.id)
+    })
+
+    if (pendingGuesses.length > 0) {
+      console.log(`Subscribed to ${pendingGuesses.length} pending guess(es)`)
     }
   },
 

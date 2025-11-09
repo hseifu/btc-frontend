@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/ticker'
 import { useAuthStore } from '@/store/authStore'
 import { useBtcStore } from '@/store/btcStore'
+import { useGuessesStore } from '@/store/guessesStore'
 import { useScoresStore } from '@/store/scoresStore'
 import { RefreshCw } from 'lucide-react'
 import { useEffect } from 'react'
@@ -29,6 +30,11 @@ export const Dashboard = () => {
     disconnectWebSocket,
     fetchBtcPriceData,
   } = useBtcStore()
+  const {
+    connectWebSocket: connectGuessSocket,
+    disconnectWebSocket: disconnectGuessSocket,
+    fetchMyGuesses,
+  } = useGuessesStore()
   const { myScore, fetchMyScore } = useScoresStore()
   const navigate = useNavigate()
 
@@ -42,10 +48,14 @@ export const Dashboard = () => {
     if (isAuthenticated && user) {
       // Connect to WebSocket for real-time BTC price updates
       connectWebSocket()
+      // Connect to WebSocket for real-time guess notifications
+      connectGuessSocket()
       fetchMyScore(user.id)
+      fetchMyGuesses()
 
       return () => {
         disconnectWebSocket()
+        disconnectGuessSocket()
       }
     }
   }, [
@@ -53,7 +63,10 @@ export const Dashboard = () => {
     user,
     connectWebSocket,
     disconnectWebSocket,
+    connectGuessSocket,
+    disconnectGuessSocket,
     fetchMyScore,
+    fetchMyGuesses,
   ])
 
   if (!user) {
