@@ -1,6 +1,6 @@
 import { LoginForm } from '@/components/login-form'
 import { useAuthStore } from '@/store/authStore'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 export const Login = () => {
@@ -11,7 +11,6 @@ export const Login = () => {
     clearError,
     isAuthenticated,
   } = useAuthStore()
-  const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -22,14 +21,12 @@ export const Login = () => {
 
   const handleSubmit = async (data: { email: string; password: string }) => {
     clearError()
-    setError(null)
 
     try {
       await login(data.email, data.password)
       navigate('/dashboard')
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Login failed'
-      setError(errorMessage)
     }
   }
 
@@ -40,7 +37,7 @@ export const Login = () => {
           <LoginForm
             onSubmit={handleSubmit}
             isLoading={isLoading}
-            error={error || storeError}
+            error={storeError}
           />
           <div className="text-center mt-4 text-sm">
             <Link to="/signup" className="text-blue-600 hover:underline">

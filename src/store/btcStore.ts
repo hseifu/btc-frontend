@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from '@/config/api'
+import { apiClient } from '@/lib/axios'
 import { create } from 'zustand'
 
 export interface BtcPriceData {
@@ -23,21 +23,12 @@ export const useBtcStore = create<BtcState>((set) => ({
   fetchBtcPriceData: async () => {
     set({ isLoading: true, error: null })
     try {
-      const response = await fetch(API_ENDPOINTS.BTC.PRICE, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch BTC price')
-      }
-
-      const data = await response.json()
+      const response = await apiClient.get<BtcPriceData>(
+        '/v1/btc-tracker/price',
+      )
 
       set({
-        btcPriceData: data,
+        btcPriceData: response.data,
         isLoading: false,
         error: null,
       })
