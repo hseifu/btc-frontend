@@ -172,10 +172,11 @@ export const useGuessesStore = create<GuessesState>((set, get) => ({
       }))
 
       // Refetch the user's score after guess validation in order to update the shown score in the dashboard
-      const { fetchMyScore } = useScoresStore.getState()
+      const { fetchMyScore, fetchLeaderboard } = useScoresStore.getState()
       if (validatedGuess.userId) {
         fetchMyScore(validatedGuess.userId)
       }
+      fetchLeaderboard()
     })
 
     socket.on('disconnect', () => {

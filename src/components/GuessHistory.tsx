@@ -11,6 +11,7 @@ import {
 import { GuessStatus, useGuessesStore } from '@/store/guessesStore'
 import { ArrowDown, ArrowUp, Clock, History } from 'lucide-react'
 import { useEffect } from 'react'
+import { CountdownTimer } from './CountdownTimer'
 import { TickerPriceChange } from './ui/ticker'
 
 export const GuessHistory = () => {
@@ -98,7 +99,14 @@ export const GuessHistory = () => {
                       />
                     )}
                   </TableCell>
-                  <TableCell>{getStatusBadge(guess.status)}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {getStatusBadge(guess.status)}
+                      {guess.status === GuessStatus.PENDING && (
+                        <CountdownTimer createdAt={guess.createdAt} />
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell className="text-sm text-gray-500">
                     {new Date(guess.createdAt).toLocaleString()}
                   </TableCell>

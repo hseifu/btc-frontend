@@ -24,4 +24,4 @@ Copy the `.env.example` file and rename it to just `.env`. Set the `VITE_API_URL
 
 ### Start the app
 
-`npm run start`
+`npm run dev`
