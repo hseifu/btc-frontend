@@ -2,6 +2,7 @@ import { disconnectGuessSocket, getGuessSocket } from '@/config/socket'
 import { apiClient } from '@/lib/axios'
 import { AxiosError } from 'axios'
 import { create } from 'zustand'
+import { useScoresStore } from './scoresStore'
 
 export enum GuessDirection {
   UP = 'UP',
@@ -169,6 +170,12 @@ export const useGuessesStore = create<GuessesState>((set, get) => ({
           guess.id === validatedGuess.id ? validatedGuess : guess,
         ),
       }))
+
+      // Refetch the user's score after guess validation in order to update the shown score in the dashboard
+      const { fetchMyScore } = useScoresStore.getState()
+      if (validatedGuess.userId) {
+        fetchMyScore(validatedGuess.userId)
+      }
     })
 
     socket.on('disconnect', () => {
